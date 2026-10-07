@@ -30,6 +30,10 @@ RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framewor
         storage/logs storage/app/private bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache
 
+    # Keep a single Apache MPM: mod_php needs mpm_prefork only
+RUN a2dismod mpm_event mpm_worker || true \
+    && a2enmod mpm_prefork
+    
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 

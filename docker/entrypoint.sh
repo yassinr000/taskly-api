@@ -18,4 +18,7 @@ if [ "${RUN_MIGRATIONS:-true}" = "true" ]; then
 fi
 
 chown -R www-data:www-data storage bootstrap/cache
+# Make sure only one Apache MPM is active when the container starts
+rm -f /etc/apache2/mods-enabled/mpm_event.* /etc/apache2/mods-enabled/mpm_worker.*
+a2enmod mpm_prefork > /dev/null 2>&1 || true
 exec "$@"
