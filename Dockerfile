@@ -24,6 +24,12 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
 # Envoi de fichiers jusqu'à 5 Mo (+ marge pour le formulaire).
 RUN printf "upload_max_filesize=6M\npost_max_size=8M\n" > /usr/local/etc/php/conf.d/uploads.ini
 
+# Durcissement : ne pas révéler les versions de PHP et d'Apache dans les réponses.
+# (le fichier zz-... est chargé en dernier et remplace "ServerTokens OS" de Debian)
+RUN printf "expose_php=Off\n" > /usr/local/etc/php/conf.d/security.ini \
+    && printf "ServerTokens Prod\nServerSignature Off\nTraceEnable Off\n" > /etc/apache2/conf-available/zz-hardening.conf \
+    && a2enconf zz-hardening
+
 WORKDIR /var/www/html
 COPY --from=vendor /app /var/www/html
 RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views \
