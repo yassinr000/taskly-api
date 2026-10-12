@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -14,6 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Derrière un proxy HTTPS (Render, Railway...), garde le bon schéma d'URL.
         $middleware->trustProxies(at: '*');
+
+        // En-têtes de sécurité sur toutes les réponses (CSP, nosniff, HSTS...).
+        $middleware->append(SecurityHeaders::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Les erreurs de /api/* sont toujours renvoyées en JSON.
